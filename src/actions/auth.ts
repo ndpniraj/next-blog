@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import dbConnect from "@/lib/db";
 import UserModel from "@/models/user";
 import { CredentialsSignin } from "next-auth";
@@ -119,4 +119,8 @@ export const signInUser = async (
   }
 
   return null;
+};
+
+export const signOutAction = async () => {
+  await signOut();
 };

@@ -26,6 +26,12 @@ class CustomAuthError extends CredentialsSignin {
   code = "custom_auth_error";
 }
 
+declare module "next-auth" {
+  interface User {
+    banner?: string;
+  }
+}
+
 const config: NextAuthConfig = {
   providers: [
     credentials({
@@ -53,12 +59,36 @@ const config: NextAuthConfig = {
         return {
           id: user._id.toString(),
           name: user.name,
+          email: user.email,
           image: user.avatar?.url,
           banner: user.banner?.url,
         };
       },
     }),
   ],
+  callbacks: {
+    jwt(params) {
+      const { token, user } = params;
+
+      if (user) {
+        token.id = user.id;
+        token.banner = user.banner;
+      }
+
+      return params.token;
+    },
+    session({ session, token }) {
+      const user = session.user as any;
+
+      if (token) {
+        user.id = token.id;
+        user.banner = token.banner;
+        session.user = user;
+      }
+
+      return session;
+    },
+  },
 };
 
 export const {
