@@ -75,6 +75,10 @@ const config: NextAuthConfig = {
         token.banner = user.banner;
       }
 
+      if (params.trigger === "update") {
+        params.token = { ...params.token, ...params.session };
+      }
+
       return params.token;
     },
     session({ session, token }) {

@@ -7,7 +7,7 @@ interface Props {}
 
 const ProfileOptions: FC<Props> = async (props) => {
   const session = await auth();
-  console.log(session);
+
   const user = session?.user;
   const userProfile: UserProfile = {
     id: user?.id || "",
