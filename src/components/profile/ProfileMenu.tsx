@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
+import Link from "next/link";
 import { FC } from "react";
 
 export interface UserProfile {
@@ -15,6 +16,7 @@ export interface UserProfile {
   name: string;
   email: string;
   avatar?: string;
+  banner?: string;
 }
 
 interface Props {
@@ -39,7 +41,9 @@ const ProfileMenu: FC<Props> = ({ userProfile }) => {
           <p className="font-semibold">{userProfile.email}</p>
         </DropdownItem>
         <DropdownItem key="settings">Create Blog</DropdownItem>
-        <DropdownItem key="team_settings">Profile</DropdownItem>
+        <DropdownItem as={Link} href="/profile" key="team_settings">
+          Profile
+        </DropdownItem>
 
         <DropdownItem key="logout" color="danger">
           <form action={signOutAction}>

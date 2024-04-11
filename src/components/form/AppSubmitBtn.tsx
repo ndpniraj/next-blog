@@ -5,9 +5,12 @@ import { useFormStatus } from "react-dom";
 
 interface Props extends ButtonProps {
   title?: string;
+  visible?: boolean;
 }
 
-const AppSubmitBtn: FC<Props> = ({ title, ...rest }) => {
+const AppSubmitBtn: FC<Props> = ({ title, visible = true, ...rest }) => {
+  if (!visible) return null;
+
   const { pending } = useFormStatus();
   return (
     <Button isLoading={pending} {...rest}>
