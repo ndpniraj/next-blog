@@ -18,34 +18,39 @@ interface Props {
 // };
 
 const fetchMdxCompiledPost = async (slug: string) => {
-  await dbConnect();
-  const post = await PostModel.findOne({ slug }).populate<{
-    createdBy: { name: string; avatar?: { id: string; url: string } };
-  }>({
-    path: "createdBy",
-    select: "name avatar",
-  });
-  if (!post) notFound();
+  try {
+    await dbConnect();
+    const post = await PostModel.findOne({ slug }).populate<{
+      createdBy: { name: string; avatar?: { id: string; url: string } };
+    }>({
+      path: "createdBy",
+      select: "name avatar",
+    });
+    if (!post) notFound();
 
-  const compiledSource = await compileMDX<{
-    title: string;
-    description: string;
-  }>({
-    source: post.body,
-    components,
-    options: { parseFrontmatter: true },
-  });
+    const compiledSource = await compileMDX<{
+      title: string;
+      description: string;
+    }>({
+      source: post.body,
+      components,
+      options: { parseFrontmatter: true },
+    });
 
-  return {
-    mdxSource: compiledSource,
-    estimatedReadingTime: post.estimatedReadingTime,
-    publishedAt: post.createdAt,
-    thumbnail: post.thumbnail?.url,
-    userProfile: {
-      name: post.createdBy.name,
-      avatar: post.createdBy.avatar?.url,
-    },
-  };
+    return {
+      mdxSource: compiledSource,
+      estimatedReadingTime: post.estimatedReadingTime,
+      publishedAt: post.createdAt,
+      thumbnail: post.thumbnail?.url,
+      userProfile: {
+        name: post.createdBy.name,
+        avatar: post.createdBy.avatar?.url,
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 export const generateMetadata = async ({
@@ -60,14 +65,18 @@ export const generateMetadata = async ({
 };
 
 export const generateStaticParams = async () => {
-  await dbConnect();
-  const posts = await PostModel.find().select("slug");
+  try {
+    await dbConnect();
+    const posts = await PostModel.find().select("slug");
 
-  return posts.map((post) => {
-    return {
-      slug: post.slug,
-    };
-  });
+    return posts.map((post) => {
+      return {
+        slug: post.slug,
+      };
+    });
+  } catch (error) {
+    throw error;
+  }
 };
 
 const SinglePost: FC<Props> = async ({ params }) => {
