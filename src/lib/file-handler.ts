@@ -6,6 +6,8 @@ export const uploadFileToCloud = async (
   file: File,
   options?: UploadApiOptions
 ): Promise<UploadApiResponse | undefined> => {
+  if (file.size <= 0) return;
+
   const arrayBuffer = await file.arrayBuffer();
 
   const buffer: Buffer = Buffer.from(arrayBuffer);

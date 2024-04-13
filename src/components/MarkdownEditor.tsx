@@ -8,6 +8,10 @@ import { MDXRemote } from "next-mdx-remote";
 import PostDetail, { post } from "./PostDetail";
 import { FaEdit } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
+import readingTime from "reading-time";
+import { useFormState } from "react-dom";
+import { createPost } from "@/actions/post";
+import ErrorUI from "./ErrorUI";
 
 interface Props {}
 
@@ -15,6 +19,7 @@ const MarkdownEditor: FC<Props> = (props) => {
   const [post, setPost] = useState("");
   const [viewPost, setViewPost] = useState(false);
   const [mdxSource, setMdxSource] = useState<post>();
+  const [state, action] = useFormState(createPost, null);
 
   useEffect(() => {
     if (!post.trim()) return;
@@ -32,37 +37,43 @@ const MarkdownEditor: FC<Props> = (props) => {
   return (
     <>
       {viewPost ? (
-        <PostDetail mdxSource={mdxSource} />
+        <PostDetail
+          mdxSource={mdxSource}
+          estimatedReadingTime={readingTime(post).text}
+        />
       ) : (
         <div>
+          <ErrorUI message={state?.error} />
           <FileUploadUI />
 
           <Divider className="my-5" />
 
-          <textarea
-            className="min-h-[400px] outline-none p-4 rounded shadow resize-none w-full text-xl"
-            placeholder="Start writing here..."
-            value={post}
-            onChange={({ target }) => setPost(target.value)}
-          />
+          <form action={action}>
+            <textarea
+              name="body"
+              className="min-h-[400px] outline-none p-4 rounded shadow resize-none w-full text-xl"
+              placeholder="Start writing here..."
+              value={post}
+              onChange={({ target }) => setPost(target.value)}
+            />
+            <div className="mt-6 space-y-3">
+              <div>
+                <label htmlFor="thumbnail" className="cursor-pointer">
+                  <span className="mr-2 font-semibold">Select Thumbnail:</span>
+                  <input
+                    type="file"
+                    id="thumbnail"
+                    name="thumbnail"
+                    className="cursor-pointer"
+                  />
+                </label>
+              </div>
 
-          <div className="mt-6 space-y-3">
-            <div>
-              <label htmlFor="thumbnail" className="cursor-pointer">
-                <span className="mr-2 font-semibold">Select Thumbnail:</span>
-                <input
-                  type="file"
-                  id="thumbnail"
-                  name="thumbnail"
-                  className="cursor-pointer"
-                />
-              </label>
+              <div>
+                <AppSubmitBtn title="Publish" type="submit" />
+              </div>
             </div>
-
-            <div>
-              <AppSubmitBtn title="Publish" type="submit" />
-            </div>
-          </div>
+          </form>
         </div>
       )}
 

@@ -1,21 +1,43 @@
 "use client";
-import { Chip, Tooltip } from "@nextui-org/react";
-import { FC } from "react";
+import { Chip, Tooltip, input } from "@nextui-org/react";
+import { FC, useEffect, useRef, useState } from "react";
 import { CiImageOn } from "react-icons/ci";
 import AppSubmitBtn from "./form/AppSubmitBtn";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import copy from "copy-to-clipboard";
+import { useFormState } from "react-dom";
+import { uploadImageFile } from "@/actions/file";
+import ErrorUI from "./ErrorUI";
 
 interface Props {}
 
 const FileUploadUI: FC<Props> = (props) => {
-  const imageUrl =
-    "https://images.unsplash.com/photo-1712698396006-1996dc7cb2cc?q=80&w=2701&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  const [showSubmitBtn, setShowSubmitBtn] = useState(false);
+  const [state, action] = useFormState(uploadImageFile, null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (state?.imageUrl) {
+      setShowSubmitBtn(false);
+      if (inputRef.current) inputRef.current.value = null as any;
+    }
+  }, [state]);
+
   return (
     <div>
-      <form className="flex space-x-2 mb-4">
+      <ErrorUI message={state?.error} />
+      <form action={action} className="flex space-x-2 mb-4">
         <label htmlFor="image">
-          <input type="file" name="image" id="image" hidden />
+          <input
+            ref={inputRef}
+            onChange={() => {
+              setShowSubmitBtn(true);
+            }}
+            type="file"
+            name="image"
+            id="image"
+            hidden
+          />
 
           <Chip
             radius="sm"
@@ -31,20 +53,23 @@ const FileUploadUI: FC<Props> = (props) => {
         <AppSubmitBtn
           startContent={<FaCloudUploadAlt size={20} />}
           title="Upload Image"
-          visible={false}
+          visible={showSubmitBtn}
+          type="submit"
         />
       </form>
 
-      <div className="line-clamp-1">
-        <Tooltip showArrow content="Click to Copy">
-          <p
-            onClick={() => copy(`![alt text](${imageUrl})`)}
-            className="truncate cursor-pointer"
-          >
-            {imageUrl}
-          </p>
-        </Tooltip>
-      </div>
+      {state?.imageUrl ? (
+        <div className="line-clamp-1">
+          <Tooltip showArrow content="Click to Copy">
+            <p
+              onClick={() => copy(`![alt text](${state.imageUrl})`)}
+              className="truncate cursor-pointer"
+            >
+              {state.imageUrl}
+            </p>
+          </Tooltip>
+        </div>
+      ) : null}
     </div>
   );
 };
