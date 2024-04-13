@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
+import cloud from "@/lib/cloud";
 import dbConnect from "@/lib/db";
 import { uploadFileToCloud } from "@/lib/file-handler";
 import PostModel from "@/models/post";
@@ -72,4 +73,65 @@ export const createPost = async (
 
   const path = `/blog/update/${post.slug}`;
   redirect(path);
+};
+
+type postInfo = { userId: string; slug: string };
+type UpdateRes = { error: string } | null;
+
+export const updatePost = async (
+  postInfo: postInfo,
+  state: UpdateRes,
+  formData: FormData
+): Promise<UpdateRes> => {
+  const session = await auth();
+  if (!session?.user)
+    return {
+      error: "unauthorized access!",
+    };
+
+  const body = formData.get("body");
+  const thumbnail = formData.get("thumbnail");
+
+  if (typeof body !== "string" || !body.trim()) {
+    return {
+      error: "Post body is missing!",
+    };
+  }
+
+  const parsedMarkdown = matter(body);
+  const postTitle = parsedMarkdown.data.title;
+  if (!postTitle) {
+    return {
+      error: "Post title is missing!",
+    };
+  }
+
+  await dbConnect();
+  const post = await PostModel.findOne({ slug: postInfo.slug });
+  if (!post) {
+    return {
+      error: "Post not found!",
+    };
+  }
+
+  post.body = body;
+  post.title = postTitle;
+
+  if (thumbnail instanceof File) {
+    const cloudRes = await uploadFileToCloud(thumbnail);
+    if (cloudRes) {
+      if (post.thumbnail?.id) {
+        await cloud.uploader.destroy(post.thumbnail.id);
+      }
+
+      post.thumbnail = {
+        url: cloudRes.secure_url,
+        id: cloudRes.public_id,
+      };
+    }
+  }
+
+  await post.save();
+
+  return null;
 };

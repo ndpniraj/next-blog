@@ -40,7 +40,9 @@ const ProfileMenu: FC<Props> = ({ userProfile }) => {
           <p className="font-semibold">Signed in as</p>
           <p className="font-semibold">{userProfile.email}</p>
         </DropdownItem>
-        <DropdownItem key="settings">Create Blog</DropdownItem>
+        <DropdownItem as={Link} href="/blog/create" key="settings">
+          Create Blog
+        </DropdownItem>
         <DropdownItem as={Link} href="/profile" key="team_settings">
           Profile
         </DropdownItem>
