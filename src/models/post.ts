@@ -7,6 +7,7 @@ interface PostDoc extends Document {
   estimatedReadingTime: string;
   createdBy: ObjectId;
   thumbnail?: { url: string; id: string };
+  createdAt: Date;
 }
 
 const postSchema = new Schema<PostDoc>(

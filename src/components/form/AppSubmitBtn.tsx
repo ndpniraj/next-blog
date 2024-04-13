@@ -9,9 +9,9 @@ interface Props extends ButtonProps {
 }
 
 const AppSubmitBtn: FC<Props> = ({ title, visible = true, ...rest }) => {
+  const { pending } = useFormStatus();
   if (!visible) return null;
 
-  const { pending } = useFormStatus();
   return (
     <Button isLoading={pending} {...rest}>
       {title}

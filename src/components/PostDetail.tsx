@@ -27,6 +27,7 @@ export const components: MDXComponents = {
     return <h3 className="text-2xl mb-6 font-medium">{children}</h3>;
   },
   p: ({ children }) => {
+    if (typeof children === "object") return <>{children}</>;
     return (
       <p className="mb-6 tracking-wider text-xl leading-loose">{children}</p>
     );
@@ -50,9 +51,9 @@ export const components: MDXComponents = {
     return (
       <blockquote className="flex space-x-2 items-center mb-6">
         <div className="w-0.5 bg-gray-400 h-20" />
-        <p className="tracking-wider text-xl leading-loose italic font-semibold">
+        <div className="tracking-wider text-xl leading-loose italic font-semibold">
           {children}
-        </p>
+        </div>
       </blockquote>
     );
   },

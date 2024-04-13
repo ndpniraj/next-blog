@@ -46,7 +46,7 @@ const PostForm: FC<Props> = ({
     }).then((result) => {
       setMdxSource(result);
     });
-  }, [post]);
+  }, [post, isDevMode]);
 
   return (
     <>
