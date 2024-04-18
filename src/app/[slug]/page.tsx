@@ -59,17 +59,6 @@ export const generateMetadata = async ({
   };
 };
 
-export const generateStaticParams = async () => {
-  await dbConnect();
-  const posts = await PostModel.find().select("slug");
-
-  return posts.map((post) => {
-    return {
-      slug: post.slug,
-    };
-  });
-};
-
 const SinglePost: FC<Props> = async ({ params }) => {
   const {
     thumbnail,

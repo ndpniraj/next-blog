@@ -1,14 +1,17 @@
+"use client";
 import { FC } from "react";
 import AuthOptions from "./AuthOptions";
 import ProfileMenu, { UserProfile } from "./ProfileMenu";
 import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 
 interface Props {}
 
-const ProfileOptions: FC<Props> = async (props) => {
-  const session = await auth();
+const ProfileOptions: FC<Props> = (props) => {
+  // const session = await auth();
+  const session = useSession();
 
-  const user = session?.user;
+  const user = session.data?.user;
   const userProfile: UserProfile = {
     id: user?.id || "",
     name: user?.name || "",
