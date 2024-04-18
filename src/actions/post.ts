@@ -6,6 +6,7 @@ import dbConnect from "@/lib/db";
 import { uploadFileToCloud } from "@/lib/file-handler";
 import PostModel from "@/models/post";
 import matter from "gray-matter";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import readingTime from "reading-time";
 import slugify from "slugify";
@@ -72,6 +73,7 @@ export const createPost = async (
   });
 
   const path = `/blog/update/${post.slug}`;
+  revalidatePath("/");
   redirect(path);
 };
 
